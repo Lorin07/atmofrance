@@ -1,0 +1,2 @@
+# Traitement Spark AtmoFrance
+pyspark==3.5.1

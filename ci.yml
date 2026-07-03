@@ -1,0 +1,54 @@
+name: CI AtmoFrance
+
+# Declenche le workflow a chaque push et pull request sur la branche principale.
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  qualite-et-tests:
+    name: Qualite du code et tests unitaires
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Recuperation du code
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      # 2. Installation de Python (meme version que le projet)
+      - name: Installer Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      # 3. Mise a jour de pip et installation des dependances necessaires aux tests.
+      #    Les tests portent sur la logique pure mais importent des modules qui
+      #    dependent de pyspark, kafka et dotenv : on installe donc ces paquets.
+      - name: Installer les dependances
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+          pip install pyspark kafka-python-ng python-dotenv
+
+      # 4. Analyse statique du code avec ruff (style, imports, bonnes pratiques)
+      - name: Verifier la qualite du code (ruff)
+        run: ruff check ingestion processing api dashboard tests
+
+      # 5. Execution des tests unitaires
+      - name: Executer les tests unitaires (pytest)
+        run: pytest tests/unit -v
+
+  # Job optionnel : verification que les images Docker se construisent.
+  # Desactive par defaut (necessite des Dockerfiles). Laisse en commentaire
+  # comme perspective d'evolution.
+  #
+  # build-docker:
+  #   name: Construction des images Docker
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Construire l'image
+  #       run: docker build -t atmofrance:ci .

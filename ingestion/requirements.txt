@@ -1,0 +1,12 @@
+# Ingestion AtmoFrance
+# kafka-python-ng : fork maintenu compatible Python 3.12+ (API identique a kafka-python)
+kafka-python-ng==2.2.3
+python-dotenv==1.0.1
+minio==7.2.7
+
+# Tests
+pytest==8.2.1
+
+# Bases de donnees
+psycopg[binary]
+pymongo==4.7.2

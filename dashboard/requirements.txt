@@ -1,0 +1,9 @@
+# Dashboard AtmoFrance
+# Pas de version epinglee sur pandas (paquet natif) : pip choisit le wheel
+# compatible avec la version de Python installee (evite toute compilation).
+streamlit
+folium
+streamlit-folium
+plotly
+pandas
+requests

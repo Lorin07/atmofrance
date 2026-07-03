@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Environnement
+.env
+*.local
+
+# Donnees volumineuses
+data/raw/
+data/processed/
+*.parquet
+*.csv
+!tests/**/*.csv
+
+# Modeles
+ml/models/*.joblib
+ml/models/*.pkl
+
+# Volumes Docker persistes
+volumes/
+minio-data/
+postgres-data/
+mongo-data/
+
+# Airflow
+infra/airflow/logs/
+airflow.db
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
