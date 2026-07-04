@@ -43,3 +43,7 @@ derby.log
 .DS_Store
 .idea/
 .vscode/
+_archive/
+
+# Airflow (home complet : base, logs, config generee)
+infra/airflow/home/
