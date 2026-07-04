@@ -1,4 +1,5 @@
-name: CI AtmoFrance
+pip install pyspark kafka-python-ng python-dotenv
+          pip install minio "psycopg[binary]" pymongo requestsname: CI AtmoFrance
 
 on:
   push:
@@ -26,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff pytest
           pip install pyspark kafka-python-ng python-dotenv
+          pip install minio "psycopg[binary]" pymongo requests
 
       - name: Verifier la qualite du code (ruff)
         run: ruff check ingestion processing api dashboard tests
