@@ -1,70 +1,129 @@
 # AtmoFrance
 
-Plateforme d'ingenierie de donnees temps reel pour la surveillance de la qualite de l'air en France et l'analyse de son impact sanitaire.
+Plateforme d'ingénierie de données pour la surveillance de la qualité de l'air en France.
 
-Le systeme ingere les mesures horaires des stations de surveillance nationales, les croise avec des donnees meteorologiques, geographiques et demographiques, detecte les depassements de seuils reglementaires et predit les pics de pollution a 24 heures. L'ensemble est expose via une API REST et un tableau de bord cartographique interactif.
+Le système ingère les mesures des stations de surveillance nationales, les fiabilise, les enrichit de leur géolocalisation, calcule l'indice ATMO officiel et détecte les dépassements de seuils réglementaires. L'ensemble est exposé via une API REST et une application web cartographique interactive.
 
-## Probleme traite
+## Aperçu
 
-La pollution atmospherique est la premiere cause environnementale de mortalite en Europe. Les donnees existent mais restent dispersees et peu exploitees en vue analytique. AtmoFrance construit une chaine complete, de l'ingestion temps reel a la restitution decisionnelle, pour transformer ces mesures en information sanitaire actionnable.
+![Interface AtmoFrance](docs/screenshots/carte.png)
+
+## Problème traité
+
+La pollution atmosphérique est la première cause environnementale de mortalité en Europe. Les données existent mais restent dispersées et peu exploitées en vue analytique. AtmoFrance construit une chaîne complète, de l'ingestion à la restitution, pour transformer ces mesures en information exploitable.
 
 ## Architecture
 
-Architecture Lakehouse Medallion (Bronze / Silver / Gold) combinant traitement en flux et en lot.
+Architecture Lakehouse Médaillon (Bronze / Silver / Gold) combinant traitement en flux et en lot.
 
-| Couche | Technologie | Role |
+| Couche | Technologie | Rôle |
 |--------|-------------|------|
-| Ingestion streaming | Kafka | Flux temps reel des mesures et de la meteo |
-| Ingestion batch | Python + Spark | Chargement de l'historique massif |
-| Traitement distribue | Spark Structured Streaming | Nettoyage, enrichissement, agregation |
-| Datalake | MinIO (S3-compatible) | Zones Bronze / Silver / Gold en Parquet |
-| Stockage relationnel + geo | PostgreSQL + PostGIS | Agregats Gold et referentiel geographique |
-| Stockage NoSQL | MongoDB | Releves bruts semi-structures |
-| Orchestration | Airflow | DAGs batch, qualite et entrainement ML |
-| Qualite | Great Expectations | Porte de qualite avant la zone Gold |
-| API | FastAPI | Exposition des KPIs, stations et alertes |
-| Restitution | Streamlit | Tableau de bord cartographique interactif |
-| ML | scikit-learn / XGBoost | Prevision de pollution a 24 h |
+| Ingestion streaming | Apache Kafka | Flux temps réel des mesures |
+| Traitement distribué | Apache Spark | Nettoyage, enrichissement, agrégation |
+| Datalake | MinIO (compatible S3) | Zones Bronze / Silver / Gold en Parquet |
+| Stockage relationnel + géo | PostgreSQL + PostGIS | Indices Gold et référentiel géographique |
+| Stockage NoSQL | MongoDB | Relevés bruts semi-structurés |
+| Orchestration | Apache Airflow | Pipeline quotidien automatisé |
+| API | FastAPI | Exposition des indices, stations et alertes |
+| Restitution | React | Application web cartographique interactive |
 
-Voir docs/architecture.md pour le detail.
+Voir `docs/architecture.md` pour le détail.
 
-## Sources de donnees
+## Fonctionnalités implémentées
 
-Toutes les sources sont publiques et sous licence ouverte. Voir docs/data-sources.md.
+- Ingestion en flux de ~31 000 mesures via Kafka
+- Architecture médaillon Bronze / Silver / Gold sur MinIO (format Parquet, partitionné)
+- Calcul de l'indice ATMO par station (6 polluants réglementés)
+- Géolocalisation de 410 stations par croisement avec la Base Adresse Nationale
+- Détection des dépassements de seuils (information et alerte)
+- Orchestration quotidienne du pipeline via Airflow
+- API REST documentée (FastAPI + Swagger)
+- Application web React : carte interactive, tableau de bord analytique, assistant conversationnel, 8 langues
+- Tests automatisés et intégration continue (GitHub Actions)
 
-- Geod'Air / LCSQA : mesures horaires temps reel (6 polluants, ~600 stations)
-- Geod'Air historique : archive depuis 2013
-- Open-Meteo : donnees meteorologiques
-- INSEE / IGN : population et contours geographiques
+## Perspectives d'évolution
 
-## Demarrage rapide
+Ces axes constituent des extensions envisagées, non encore implémentées :
 
-Prerequis : Docker et Docker Compose.
+- **Prévision de la qualité de l'air à 24 h** par apprentissage automatique, en croisant l'historique des mesures avec des données météorologiques
+- **Enrichissement météorologique** des mesures (le soleil et le vent conditionnent la formation des polluants)
+- **Migration cloud** effective de la plateforme (les choix techniques, notamment le datalake compatible S3, la rendent immédiate)
+
+## Stack technique
+
+**Données** : PostgreSQL + PostGIS, MongoDB, MinIO
+**Streaming & traitement** : Apache Kafka, Apache Spark
+**Orchestration** : Apache Airflow
+**API** : FastAPI
+**Interface** : React, Leaflet, Recharts, i18next
+**Infrastructure** : Docker, Docker Compose
+**Qualité & CI** : pytest, ruff, GitHub Actions
+
+## Démarrage rapide
+
+### Prérequis
+- Docker et Docker Compose
+- Python 3.13
+- Node.js 18+
+
+### Lancement
 
 ```bash
-cp .env.example .env      # ajuster les mots de passe
-make up                   # demarre le socle
-make ps                   # verifie l'etat des services
+# 1. Démarrer les services (bases, Kafka, MinIO)
+docker compose up -d
+
+# 2. Environnement Python
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt   # ou : make install
+
+# 3. Configurer les variables d'environnement
+cp .env.example .env
+# puis renseigner les valeurs dans .env
+
+# 4. Lancer le pipeline (via Airflow, voir docs/)
+
+# 5. Démarrer l'API
+.venv/bin/python -m uvicorn api.main:app --port 8000
+
+# 6. Démarrer l'interface web
+cd interface
+npm install
+npm run dev
 ```
 
-Interfaces disponibles une fois le socle demarre :
+- API : `http://localhost:8000` (documentation interactive : `/docs`)
+- Interface : `http://localhost:5173`
 
-- Console MinIO : http://localhost:9001
-- PostgreSQL : localhost:5432
-- MongoDB : localhost:27017
-- Kafka : localhost:29092 (depuis l'hote)
-
-## Structure du depot
+## Structure du projet
 
 ```
 atmofrance/
-├── docker-compose.yml   Orchestration du stack
-├── infra/               Configuration des services (Kafka, Postgres, Airflow, etc.)
-├── ingestion/           Producteurs de flux et chargements batch
-├── processing/          Traitements Spark et controles qualite
-├── ml/                  Entrainement et evaluation du modele predictif
-├── api/                 API REST FastAPI
-├── dashboard/           Tableau de bord Streamlit
-├── tests/               Tests unitaires et d'integration
-└── docs/                Documentation et decisions d'architecture
+├── api/            # API FastAPI (endpoints, requêtes)
+├── ingestion/      # Producteurs et consommateurs Kafka
+├── processing/     # Transformations Spark (Bronze -> Silver -> Gold)
+├── infra/          # Configuration Airflow et infrastructure
+├── tests/          # Tests unitaires
+├── interface/      # Application web React
+├── ml/             # Espace réservé aux modèles (perspective)
+├── docs/           # Documentation et captures d'écran
+├── scripts/        # Scripts utilitaires (démo, diagnostic)
+├── docker-compose.yml
+├── Makefile
+└── README.md
 ```
+
+## Tests et qualité
+
+```bash
+pytest tests/ -v      # tests unitaires
+ruff check .          # analyse statique du code
+```
+
+## Contexte
+
+Projet réalisé dans le cadre du Master 2 Data Engineering & Intelligence Artificielle (EFREI Paris), en vue de la validation du titre RNCP36739 « Expert en Ingénierie de Données ».
+
+---
+
+*Sources de données : Geod'Air (LCSQA), Base Adresse Nationale — Licence Ouverte.*

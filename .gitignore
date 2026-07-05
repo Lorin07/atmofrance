@@ -47,3 +47,20 @@ _archive/
 
 # Airflow (home complet : base, logs, config generee)
 infra/airflow/home/
+# ===== À AJOUTER À TON .gitignore EXISTANT (si pas déjà présent) =====
+
+# Archives (ne jamais versionner)
+*.tar.gz
+*.zip
+
+# Sauvegardes temporaires
+*.bak
+*.tmp
+
+# Interface : dépendances et build
+interface/node_modules/
+interface/dist/
+
+# Doublons d'interface (au cas où)
+atmofrance-ui/
+atmofrance-ui0*/

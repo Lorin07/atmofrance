@@ -14,7 +14,7 @@ def lister_stations() -> list:
         SELECT code_station, nom, type_station, type_influence,
                latitude, longitude
         FROM station
-        WHERE geom IS NOT NULL
+        WHERE latitude IS NOT NULL
         ORDER BY nom
     """)
     resultat = _lignes_en_dicts(cur)
@@ -30,7 +30,7 @@ def lister_indices(jour=None) -> list:
             SELECT code_site, nom_site, jour, indice_atmo, qualificatif,
                    polluant_resp, latitude, longitude
             FROM gold_indice_journalier
-            WHERE geom IS NOT NULL AND jour = %s
+            WHERE latitude IS NOT NULL AND jour = %s
             ORDER BY indice_atmo DESC
         """, (jour,))
     else:
@@ -38,7 +38,7 @@ def lister_indices(jour=None) -> list:
             SELECT code_site, nom_site, jour, indice_atmo, qualificatif,
                    polluant_resp, latitude, longitude
             FROM gold_indice_journalier
-            WHERE geom IS NOT NULL
+            WHERE latitude IS NOT NULL
             ORDER BY jour DESC, indice_atmo DESC
         """)
     resultat = _lignes_en_dicts(cur)
@@ -101,7 +101,7 @@ def statistiques_globales() -> dict:
 
     cur.execute("SELECT COUNT(*) FROM station")
     nb_stations = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM station WHERE geom IS NOT NULL")
+    cur.execute("SELECT COUNT(*) FROM station WHERE latitude IS NOT NULL")
     nb_stations_geo = cur.fetchone()[0]
     cur.execute("SELECT COUNT(DISTINCT jour) FROM gold_indice_journalier")
     nb_jours = cur.fetchone()[0]

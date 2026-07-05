@@ -1,0 +1,272 @@
+/* AtmoFrance — Interface de surveillance. Direction : poste de commandement atmosphérique. */
+:root {
+  --atmo-1: #50CCAA; --atmo-2: #50CCF0; --atmo-3: #F0E641;
+  --atmo-4: #FF5050; --atmo-5: #960032; --atmo-6: #7D2181; --atmo-none: #8A94A6;
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+  --radius: 14px; --radius-sm: 8px;
+  --transition: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="dark"] {
+  --bg-deep: #0A0E1A; --bg-panel: #121829; --bg-panel-2: #1A2137; --bg-elevated: #222B44;
+  --border: #2A3350; --border-soft: #1F2740;
+  --text: #EAF0FF; --text-dim: #9AA6C4; --text-faint: #5F6C8A;
+  --accent: #50CCF0; --accent-glow: rgba(80,204,240,0.25);
+  --shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+[data-theme="light"] {
+  --bg-deep: #EEF2F9; --bg-panel: #FFFFFF; --bg-panel-2: #F5F8FD; --bg-elevated: #FFFFFF;
+  --border: #D8E0EE; --border-soft: #E8EEF7;
+  --text: #14203A; --text-dim: #55627E; --text-faint: #8A96AE;
+  --accent: #1E7FB0; --accent-glow: rgba(30,127,176,0.15);
+  --shadow: 0 16px 44px rgba(30,50,90,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; width: 100%; }
+body {
+  font-family: var(--font-body); background: var(--bg-deep); color: var(--text);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+.app { display: grid; grid-template-rows: auto 1fr; height: 100vh; width: 100vw; }
+.topbar { display: flex; align-items: center; gap: 20px; padding: 14px 24px; background: var(--bg-panel); border-bottom: 1px solid var(--border); z-index: 50; }
+.brand { display: flex; align-items: center; gap: 12px; user-select: none; }
+.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; position: relative; }
+.brand-title { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+.brand-title .accent { color: var(--accent); }
+.brand-tagline { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.topbar-spacer { flex: 1; }
+.nav { display: flex; gap: 4px; background: var(--bg-panel-2); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border-soft); }
+.nav-item { appearance: none; border: none; background: transparent; color: var(--text-dim); font-family: var(--font-body); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all var(--transition); white-space: nowrap; }
+.nav-item:hover { color: var(--text); background: var(--bg-elevated); }
+.nav-item.active { color: var(--bg-deep); background: var(--accent); }
+.icon-btn { appearance: none; border: 1px solid var(--border); background: var(--bg-panel-2); color: var(--text-dim); width: 38px; height: 38px; border-radius: var(--radius-sm); cursor: pointer; display: grid; place-items: center; transition: all var(--transition); }
+.icon-btn:hover { color: var(--text); border-color: var(--accent); }
+.source-badge { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border); }
+.source-dot { width: 8px; height: 8px; border-radius: 50%; }
+.source-live .source-dot { background: var(--atmo-1); box-shadow: 0 0 8px var(--atmo-1); animation: pulse-dot 2s infinite; }
+.source-offline .source-dot { background: var(--atmo-3); }
+.source-loading .source-dot { background: var(--text-faint); }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.lang-select { position: relative; }
+.lang-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow); padding: 6px; min-width: 170px; z-index: 100; }
+.lang-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border: none; background: transparent; color: var(--text); font-size: 13px; border-radius: 6px; cursor: pointer; transition: background var(--transition); text-align: left; }
+.lang-option:hover { background: var(--bg-panel-2); }
+.lang-option.active { background: var(--accent-glow); color: var(--accent); }
+.lang-flag { font-size: 16px; }
+.body { position: relative; overflow: hidden; }
+.detail-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 360px; background: var(--bg-panel); border-left: 1px solid var(--border); box-shadow: var(--shadow); z-index: 40; display: flex; flex-direction: column; overflow-y: auto; }
+.chat-fab { position: absolute; bottom: 24px; right: 24px; width: 58px; height: 58px; border-radius: 50%; border: none; background: var(--accent); color: var(--bg-deep); cursor: pointer; display: grid; place-items: center; box-shadow: 0 8px 24px var(--accent-glow), var(--shadow); z-index: 45; transition: transform var(--transition); }
+.chat-fab:hover { transform: scale(1.08); }
+.card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+.kpi-value { font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.kpi-label { font-size: 12px; color: var(--text-dim); margin-top: 6px; font-weight: 500; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 20px; }
+.mono { font-family: var(--font-mono); }
+.dim { color: var(--text-dim); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media (max-width: 900px) { .brand-tagline { display: none; } .nav-item { padding: 8px 11px; font-size: 12px; } .detail-panel { width: 100%; } }
+
+/* ===== Composants spécifiques ===== */
+/* Bandeau KPI */
+.kpi-bar { position: absolute; top: 16px; left: 16px; z-index: 30; display: flex; gap: 0; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.kpi-cell { padding: 14px 22px; border-right: 1px solid var(--border-soft); min-width: 96px; }
+.kpi-cell:last-child { border-right: none; }
+.kpi-cell .kpi-value { font-size: 26px; }
+.kpi-cell .kpi-label { font-size: 11px; }
+
+/* Recherche carte */
+
+.map-search { width: 100%; padding: 12px 18px; border-radius: 24px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text); font-family: var(--font-body); font-size: 14px; box-shadow: var(--shadow); }
+.map-search::placeholder { color: var(--text-faint); }
+.map-search-empty { margin-top: 8px; padding: 10px 16px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; font-size: 13px; color: var(--text-dim); text-align: center; }
+
+/* Légende carte */
+.map-legend { position: absolute; bottom: 24px; left: 16px; z-index: 30; padding: 14px 16px; min-width: 150px; }
+.legend-title { font-family: var(--font-display); font-size: 12px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); }
+.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.legend-label { font-size: 12px; color: var(--text); }
+
+/* Marqueurs pulsants sur la carte */
+.station-marker { transition: all 200ms; }
+.leaflet-interactive.atmo-4, .leaflet-interactive.atmo-5, .leaflet-interactive.atmo-6 { animation: marker-pulse 2s ease-in-out infinite; }
+@keyframes marker-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 0.4; } }
+
+/* Panneau de détail */
+.detail-head { padding: 22px 22px 16px; border-bottom: 1px solid var(--border-soft); position: relative; }
+.detail-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; }
+.detail-station-name { font-family: var(--font-display); font-size: 18px; font-weight: 600; padding-right: 40px; line-height: 1.3; }
+.detail-index { display: flex; align-items: center; gap: 16px; padding: 24px 22px; }
+.detail-index-circle { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+.detail-index-number { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: #0A0E1A; }
+.detail-index-quali { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.detail-attrs { padding: 8px 22px 22px; }
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-soft); }
+.detail-row-label { font-size: 13px; color: var(--text-dim); }
+.detail-row-value { font-size: 14px; font-weight: 600; }
+
+/* Vues (scroll) */
+.view-scroll { position: absolute; inset: 0; padding: 90px 32px 32px; overflow-y: auto; }
+.view-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.chart-card { min-height: 320px; }
+
+/* Table de classement */
+.rank-table { width: 100%; border-collapse: collapse; }
+.rank-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.rank-table td { padding: 12px; border-bottom: 1px solid var(--border-soft); font-size: 14px; }
+.rank-num { font-family: var(--font-display); font-weight: 700; color: var(--text-dim); }
+
+/* Alertes */
+.alert-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; }
+.alert-site { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+.alert-side { text-align: right; }
+
+/* À propos */
+.tech-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tech-tag { padding: 7px 13px; background: var(--bg-panel-2); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-family: var(--font-mono); }
+.source-list { list-style: none; }
+.source-list li { padding: 8px 0; border-bottom: 1px solid var(--border-soft); font-size: 14px; color: var(--text-dim); }
+
+/* Chatbot */
+.chat-panel { position: absolute; bottom: 92px; right: 24px; width: 360px; max-width: calc(100vw - 48px); height: 480px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); z-index: 46; display: flex; flex-direction: column; overflow: hidden; }
+.chat-header { padding: 16px 18px; font-family: var(--font-display); font-weight: 600; font-size: 15px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 8px; }
+.chat-header-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--atmo-1); box-shadow: 0 0 8px var(--atmo-1); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.5; }
+.chat-msg-bot { background: var(--bg-panel-2); align-self: flex-start; border-bottom-left-radius: 4px; }
+.chat-msg-user { background: var(--accent); color: var(--bg-deep); align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
+.chat-thinking { opacity: 0.6; font-style: italic; }
+.chat-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px; border-top: 1px solid var(--border-soft); }
+.chat-quick-btn { font-size: 12px; padding: 6px 11px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg-panel-2); color: var(--text-dim); cursor: pointer; transition: all var(--transition); }
+.chat-quick-btn:hover { color: var(--accent); border-color: var(--accent); }
+.chat-input-row { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border-soft); }
+.chat-input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel-2); color: var(--text); font-size: 13px; font-family: var(--font-body); }
+.chat-send { padding: 10px 16px; border-radius: 20px; border: none; background: var(--accent); color: var(--bg-deep); font-weight: 600; font-size: 13px; cursor: pointer; }
+
+/* Zoom leaflet adapté au thème */
+.leaflet-control-zoom a { background: var(--bg-panel) !important; color: var(--text) !important; border-color: var(--border) !important; }
+.leaflet-bar { border: 1px solid var(--border) !important; }
+
+/* Jauge de qualité globale */
+.gauge-card { position: relative; }
+.gauge-wrap { position: relative; }
+.gauge-center { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+.gauge-number { font-family: var(--font-display); font-size: 46px; font-weight: 700; line-height: 1; }
+.gauge-sub { font-size: 11px; margin-top: 4px; }
+
+/* Animation d'apparition douce des cartes du dashboard */
+.chart-card { transition: transform var(--transition), box-shadow var(--transition); }
+.chart-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+/* Animation "typing" du chatbot */
+.chat-thinking { display: flex; gap: 4px; align-items: center; }
+.typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); animation: typing 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* Effet de halo au survol des marqueurs (ajouté via la carte) */
+.leaflet-interactive { cursor: pointer; transition: fill-opacity 150ms; }
+.leaflet-interactive:hover { fill-opacity: 1 !important; }
+
+/* Transition douce entre thèmes sur la carte */
+.leaflet-container { transition: background 300ms; }
+
+/* KPI : accent sur survol */
+.kpi-cell { transition: background var(--transition); cursor: default; }
+.kpi-cell:hover { background: var(--bg-panel-2); }
+
+/* ===== ÉCRAN D'ACCUEIL ===== */
+.splash { position: fixed; inset: 0; z-index: 200; background: radial-gradient(ellipse at center, #121829 0%, #0A0E1A 70%); display: grid; place-items: center; overflow: hidden; }
+.splash-particles { position: absolute; inset: 0; }
+.splash-particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; }
+.splash-content { position: relative; text-align: center; z-index: 2; }
+.splash-logo { display: flex; justify-content: center; margin-bottom: 24px; }
+.splash-title { font-family: var(--font-display); font-size: 56px; font-weight: 700; letter-spacing: -0.03em; color: #EAF0FF; margin-bottom: 8px; }
+.splash-tagline { font-size: 16px; color: #9AA6C4; margin-bottom: 40px; }
+.splash-stats { display: flex; gap: 48px; justify-content: center; margin-bottom: 44px; }
+.splash-stat-value { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: #50CCF0; }
+.splash-stat-label { font-size: 13px; color: #9AA6C4; margin-top: 4px; }
+.splash-enter { font-family: var(--font-display); font-size: 16px; font-weight: 600; padding: 14px 40px; border-radius: 30px; border: none; background: #50CCF0; color: #0A0E1A; cursor: pointer; box-shadow: 0 8px 30px rgba(80,204,240,0.4); }
+
+/* ===== CONTRÔLES CARTE (recherche + filtres) ===== */
+
+
+.map-search { width: 100%; }
+.map-filter-btn { padding: 12px 18px; border-radius: 24px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-dim); font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow); transition: all var(--transition); }
+.map-filter-btn:hover, .map-filter-btn.active { color: var(--accent); border-color: var(--accent); }
+.map-filter-btn.has-active { background: var(--accent); color: var(--bg-deep); border-color: var(--accent); }
+.map-search-empty-float { position: absolute; top: 68px; left: 50%; transform: translateX(-50%); z-index: 30; padding: 10px 18px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; font-size: 13px; color: var(--text-dim); box-shadow: var(--shadow); }
+
+/* Barre de filtres */
+.filter-bar { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); z-index: 29; display: flex; align-items: center; gap: 22px; padding: 16px 22px; flex-wrap: wrap; box-shadow: var(--shadow); }
+.filter-group { display: flex; align-items: center; gap: 10px; }
+.filter-label { font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.filter-chips { display: flex; gap: 5px; }
+.filter-chip { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid; background: transparent; color: var(--text); font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; transition: all var(--transition); }
+.filter-chip:hover { transform: translateY(-1px); }
+.filter-select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-panel-2); color: var(--text); font-size: 13px; font-family: var(--font-body); cursor: pointer; }
+.filter-reset { padding: 8px 14px; border-radius: 20px; border: none; background: var(--atmo-4); color: #fff; font-weight: 600; font-size: 12px; cursor: pointer; }
+
+/* ===== SOUS-INDICES (détail station) ===== */
+.detail-section { padding: 16px 22px; border-bottom: 1px solid var(--border-soft); }
+.detail-section-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; }
+.subindex-list { display: flex; flex-direction: column; gap: 10px; }
+.subindex-row { display: flex; align-items: center; gap: 10px; }
+.subindex-name { width: 48px; font-size: 12px; font-weight: 600; font-family: var(--font-mono); }
+.subindex-name.lead { color: var(--accent); }
+.subindex-bar-track { flex: 1; height: 8px; background: var(--bg-panel-2); border-radius: 4px; overflow: hidden; }
+.subindex-bar-fill { height: 100%; border-radius: 4px; }
+.subindex-value { width: 18px; text-align: right; font-family: var(--font-display); font-weight: 600; font-size: 13px; }
+.subindex-note { font-size: 11px; margin-top: 10px; }
+
+/* ===== MODE PRÉSENTATION ===== */
+.presentation-mode .kpi-cell .kpi-value { font-size: 32px; }
+.presentation-mode .view-title { font-size: 32px; }
+.presentation-mode .topbar { padding: 18px 32px; }
+.presentation-mode .brand-title { font-size: 24px; }
+.presentation-mode .nav-item { font-size: 15px; padding: 10px 20px; }
+.presentation-mode .card-title { font-size: 17px; }
+
+/* Contrôles carte - layout corrigé */
+.map-controls { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 30; display: inline-flex; gap: 10px; align-items: center; }
+.map-search-wrap { width: 300px; flex-shrink: 0; }
+.map-search { width: 100%; box-sizing: border-box; }
+.map-filter-btn { flex-shrink: 0; position: relative; z-index: 31; }
+
+
+/* ===== CORRECTION SUPERPOSITION CARTE (z-index) ===== */
+/* La carte Leaflet crée son propre contexte d'empilement.
+   On la plafonne pour qu'elle reste SOUS le chatbot et le panneau de détail. */
+
+/* Le conteneur de la carte : contexte d'empilement bas et isolé */
+.map-wrap { position: absolute; inset: 0; z-index: 1; isolation: isolate; }
+
+/* Plafonner les couches internes de Leaflet */
+.leaflet-container { z-index: 1 !important; }
+.leaflet-pane { z-index: auto !important; }
+.leaflet-top, .leaflet-bottom { z-index: 400 !important; }
+/* Les contrôles de zoom Leaflet restent utilisables mais sous nos panneaux */
+.leaflet-control-container { z-index: 20 !important; }
+
+/* REMONTER les panneaux d'interface bien AU-DESSUS de la carte */
+.detail-panel { z-index: 1000 !important; }
+.chat-panel { z-index: 1100 !important; }
+.chat-fab { z-index: 1100 !important; }
+
+/* Les contrôles carte (recherche, filtres, KPI, légende) au-dessus de la carte aussi */
+.kpi-bar { z-index: 500 !important; }
+.map-controls { z-index: 500 !important; }
+.filter-bar { z-index: 499 !important; }
+.map-legend { z-index: 500 !important; }
+.map-search-empty-float { z-index: 500 !important; }
